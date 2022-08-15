@@ -1,0 +1,38 @@
+{
+  "name": "horizom/var-dumper",
+  "description": "A nicer print_r/var_dump alternative",
+  "type": "library",
+  "license": "MIT",
+  "homepage": "https://horizom.github.io",
+  "keywords": [
+    "debug",
+    "var_dump",
+    "print_r"
+  ],
+  "support": {
+    "issues": "https://github.com/horizom/var-dumper/issues",
+    "source": "https://github.com/horizom/var-dumper"
+  },
+  "authors": [
+    {
+      "name": "Roland Edi",
+      "email": "lambirou225@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Horizom\\VarDumper\\": "src/"
+    },
+    "files": [
+      "src/helpers.php.php"
+    ]
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
