@@ -1,8 +1,10 @@
 <?php
 
-namespace Horizom\VarDumper;
+namespace Horizom\VarDumper\Formatter;
 
-class RCliTextFormatter extends RTextFormatter
+use Horizom\VarDumper\VarDumper;
+
+class CliTextFormatter extends TextFormatter
 {
     public function sectionTitle($title)
     {

@@ -1,8 +1,10 @@
 <?php
 
-namespace Horizom\VarDumper;
+namespace Horizom\VarDumper\Formatter;
 
-class RHtmlFormatter extends RFormatter
+use Horizom\VarDumper\VarDumper;
+
+class HtmlFormatter extends Formatter
 {
     /**
      * Actual output
@@ -390,7 +392,7 @@ class RHtmlFormatter extends RFormatter
         if (VarDumper::config('stylePath') !== false) {
 ?>
             <style>
-                <?php readfile(str_replace('{:dir}', __DIR__, VarDumper::config('stylePath'))); ?>
+                <?php readfile(str_replace('{:dir}', dirname(__DIR__), VarDumper::config('stylePath'))); ?>
             </style>
         <?php
         }
@@ -398,7 +400,7 @@ class RHtmlFormatter extends RFormatter
         if (VarDumper::config('scriptPath') !== false) {
         ?>
             <script>
-                <?php readfile(str_replace('{:dir}', __DIR__, VarDumper::config('scriptPath'))); ?>
+                <?php readfile(str_replace('{:dir}', dirname(__DIR__), VarDumper::config('scriptPath'))); ?>
             </script>
 <?php
         }
@@ -420,6 +422,6 @@ class RHtmlFormatter extends RFormatter
      */
     protected static function escape($var)
     {
-        return is_array($var) ? array_map('static::escape', $var) : htmlspecialchars($var, ENT_QUOTES);
+        return is_array($var) ? array_map('static::escape', $var) : htmlspecialchars($var ?? '', ENT_QUOTES);
     }
 }

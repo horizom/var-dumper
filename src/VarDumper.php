@@ -125,24 +125,30 @@ class VarDumper
      */
     public function __construct($format = 'html')
     {
-
         static $didIni = false;
 
         if (!$didIni) {
             $didIni = true;
+
             foreach (array_keys(static::$config) as $key) {
                 $iniVal = get_cfg_var('ref.' . $key);
-                if ($iniVal !== false)
+
+                if ($iniVal !== false) {
                     static::$config[$key] = $iniVal;
+                }
             }
         }
 
-        if ($format instanceof RFormatter) {
+        if ($format instanceof Formatter) {
             $this->fmt = $format;
         } else {
-            $format = isset(static::$config['formatters'][$format]) ? static::$config['formatters'][$format] : 'R' . ucfirst($format) . 'Formatter';
+            if (isset(static::$config['formatters'][$format])) {
+                $format = static::$config['formatters'][$format];
+            } else {
+                $format = '\\Horizom\\VarDumper\\Formatter\\' . ucfirst($format) . 'Formatter';
+            }
 
-            if (!class_exists($format, false)) {
+            if (!class_exists($format)) {
                 throw new VarDumperException(sprintf('%s class not found', $format));
             }
 
@@ -226,9 +232,6 @@ class VarDumper
         self::$time += microtime(true) - $this->startTime;
     }
 
-
-
-
     /**
      * Executes a function the given number of times and returns the elapsed time.
      *
@@ -244,7 +247,6 @@ class VarDumper
      */
     public static function timeFunc($iterations, $function, &$output = null)
     {
-
         $time = 0;
 
         for ($i = 0; $i < $iterations; $i++) {
@@ -255,8 +257,6 @@ class VarDumper
 
         return round($time, 4);
     }
-
-
 
     /**
      * Timer utility
@@ -274,9 +274,7 @@ class VarDumper
      */
     public static function timer($id = 1, $precision = 4)
     {
-
-        static
-            $timers = array();
+        static $timers = array();
 
         // check if this timer was started, and display the elapsed time if so
         if (isset($timers[$id])) {
@@ -309,7 +307,6 @@ class VarDumper
 
         // analyze each line
         foreach ($comment as $line) {
-
             // drop any wrapping spaces
             $line = trim($line);
 
@@ -344,8 +341,9 @@ class VarDumper
             $parts = explode(' ', $line, 2);
 
             // invalid tag? (should we include it as an empty array?)
-            if (!isset($parts[1]))
+            if (!isset($parts[1])) {
                 continue;
+            }
 
             $tag = substr($parts[0], 1);
             $line = ltrim($parts[1]);
@@ -401,7 +399,6 @@ class VarDumper
 
         $title = ltrim($title);
         $description = ltrim($description);
-
         $data = compact('title', 'description', 'tags');
 
         if (!array_filter($data)) {
@@ -415,8 +412,6 @@ class VarDumper
         return $data;
     }
 
-
-
     /**
      * Split a regex into its components
      *
@@ -429,9 +424,9 @@ class VarDumper
      */
     public static function splitRegex($pattern)
     {
-
         // detection attempt code from the Symfony Finder component
         $maybeValid = false;
+
         if (preg_match('/^(.{3,}?)([imsxuADU]*)$/', $pattern, $m)) {
             $start = substr($m[1], 0, 1);
             $end   = substr($m[1], -1);
@@ -576,8 +571,9 @@ class VarDumper
                     throw new VarDumperException('Invalid or unsupported group type');
                 }
 
-                if (strlen($m) === 1)
+                if (strlen($m) === 1) {
                     $capturingGroupCount++;
+                }
 
                 $groupStyleDepth = ($groupStyleDepth !== 5) ? $groupStyleDepth + 1 : 1;
                 $openGroups[]    = $m; // opening
@@ -688,7 +684,6 @@ class VarDumper
      */
     public static function config($key, $value = null)
     {
-
         if (!array_key_exists($key, static::$config)) {
             throw new VarDumperException(sprintf('Unrecognized option: "%s". Valid options are: %s', $key, implode(', ', array_keys(static::$config))));
         }
@@ -704,8 +699,6 @@ class VarDumper
         return static::$config[$key] = $value;
     }
 
-
-
     /**
      * Total CPU time used by the class
      *
@@ -717,8 +710,6 @@ class VarDumper
         return round(self::$time, $precision);
     }
 
-
-
     /**
      * Get relevant backtrace info for last ref call
      *
@@ -726,7 +717,6 @@ class VarDumper
      */
     public static function getBacktrace()
     {
-
         // pull only basic info with php 5.3.6+ to save some memory
         $trace = defined('DEBUG_BACKTRACE_IGNORE_ARGS') ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) : debug_backtrace();
 
@@ -746,8 +736,6 @@ class VarDumper
         return false;
     }
 
-
-
     /**
      * Determines the input expression(s) passed to the shortcut function
      *
@@ -756,15 +744,15 @@ class VarDumper
      */
     public static function getInputExpressions(array &$options = null)
     {
-
         // used to determine the position of the current call,
         // if more queries calls were made on the same line
         static $lineInst = array();
 
         $trace = static::getBacktrace();
 
-        if (!$trace)
+        if (!$trace) {
             return array();
+        }
 
         extract($trace);
 
@@ -775,32 +763,36 @@ class VarDumper
 
         // locate the caller position in the line, and isolate argument tokens
         foreach ($tokens as $i => $token) {
-
             // match token with our shortcut function name
-            if (is_string($token) || ($token[0] !== T_STRING) || (strcasecmp($token[1], $function) !== 0))
+            if (is_string($token) || ($token[0] !== T_STRING) || (strcasecmp($token[1], $function) !== 0)) {
                 continue;
+            }
 
             // is this some method that happens to have the same name as the shortcut function?
-            if (isset($tokens[$i - 1]) && is_array($tokens[$i - 1]) && in_array($tokens[$i - 1][0], array(T_DOUBLE_COLON, T_OBJECT_OPERATOR), true))
+            if (isset($tokens[$i - 1]) && is_array($tokens[$i - 1]) && in_array($tokens[$i - 1][0], array(T_DOUBLE_COLON, T_OBJECT_OPERATOR), true)) {
                 continue;
+            }
 
             // find argument definition start, just after '('
             if (isset($tokens[$i + 1]) && ($tokens[$i + 1][0] === '(')) {
                 $instIndx++;
 
-                if (!isset($lineInst[$line]))
+                if (!isset($lineInst[$line])) {
                     $lineInst[$line] = 0;
+                }
 
-                if ($instIndx <= $lineInst[$line])
+                if ($instIndx <= $lineInst[$line]) {
                     continue;
+                }
 
                 $lineInst[$line]++;
 
                 // gather options
                 if ($options !== null) {
                     $j = $i - 1;
-                    while (isset($tokens[$j]) && is_string($tokens[$j]) && in_array($tokens[$j], array('@', '+', '-', '!', '~')))
+                    while (isset($tokens[$j]) && is_string($tokens[$j]) && in_array($tokens[$j], array('@', '+', '-', '!', '~'))) {
                         $options[] = $tokens[$j--];
+                    }
                 }
 
                 $lvl = $index = $curlies = 0;
@@ -808,25 +800,29 @@ class VarDumper
 
                 // get the expressions
                 foreach (array_slice($tokens, $i + 2) as $token) {
-
                     if (is_array($token)) {
-                        if ($token[0] !== T_COMMENT)
+                        if ($token[0] !== T_COMMENT) {
                             $expressions[$index][] = ($token[0] !== T_WHITESPACE) ? $token[1] : ' ';
+                        }
 
                         continue;
                     }
 
-                    if ($token === '{')
+                    if ($token === '{') {
                         $curlies++;
+                    }
 
-                    if ($token === '}')
+                    if ($token === '}') {
                         $curlies--;
+                    }
 
-                    if ($token === '(')
+                    if ($token === '(') {
                         $lvl++;
+                    }
 
-                    if ($token === ')')
+                    if ($token === ')') {
                         $lvl--;
+                    }
 
                     // assume next argument if a comma was encountered,
                     // and we're not insde a curly bracket or inner parentheses
@@ -837,8 +833,9 @@ class VarDumper
 
                     // negative parentheses count means we reached the end of argument definitions
                     if ($lvl < 0) {
-                        foreach ($expressions as &$expression)
+                        foreach ($expressions as &$expression) {
                             $expression = trim(implode('', $expression));
+                        }
 
                         return $expressions;
                     }
@@ -853,8 +850,6 @@ class VarDumper
         return array();
     }
 
-
-
     /**
      * Get all parent classes of a class
      *
@@ -863,15 +858,14 @@ class VarDumper
      */
     protected static function getParentClasses(\Reflector $class)
     {
-
         $parents = array($class);
-        while (($class = $class->getParentClass()) !== false)
+
+        while (($class = $class->getParentClass()) !== false) {
             $parents[] = $class;
+        }
 
         return array_reverse($parents);
     }
-
-
 
     /**
      * Generate class / function info
@@ -883,7 +877,6 @@ class VarDumper
      */
     protected function fromReflector(\Reflector $reflector, $single = '', \Reflector $context = null)
     {
-
         // @todo: test this
         $hash = var_export(func_get_args(), true);
         //$hash = $reflector->getName() . ';' . $single . ';' . ($context ? $context->getName() : '');
@@ -895,14 +888,15 @@ class VarDumper
 
         $items = array($reflector);
 
-        if (($single === '') && ($reflector instanceof \ReflectionClass))
+        if (($single === '') && ($reflector instanceof \ReflectionClass)) {
             $items = static::getParentClasses($reflector);
+        }
 
         $first = true;
         foreach ($items as $item) {
-
-            if (!$first)
+            if (!$first) {
                 $this->fmt->sep(' :: ');
+            }
 
             $first    = false;
             $name     = ($single !== '') ? $single : $item->getName();
@@ -916,15 +910,17 @@ class VarDumper
             } else {
                 $comments = static::parseComment($item->getDocComment());
 
-                if ($comments)
+                if ($comments) {
                     $meta += $comments;
+                }
 
                 $meta['sub'][] = array('Defined in', basename($item->getFileName()) . ':' . $item->getStartLine());
             }
 
             if (($item instanceof \ReflectionFunction) || ($item instanceof \ReflectionMethod)) {
-                if (($context !== null) && ($context->getShortName() !== $item->getDeclaringClass()->getShortName()))
+                if (($context !== null) && ($context->getShortName() !== $item->getDeclaringClass()->getShortName())) {
                     $meta['sub'][] = array('Inherited from', $item->getDeclaringClass()->getShortName());
+                }
 
                 // @note: PHP 7 seems to crash when calling getPrototype on Closure::__invoke()
                 if (($item instanceof \ReflectionMethod) && !$item->isInternal()) {
@@ -964,22 +960,23 @@ class VarDumper
                 }
             }
 
-            if ($item->isInterface() && $single !== '')
+            if ($item->isInterface() && $single !== '') {
                 $bubbles[] = array('I', 'Interface');
+            }
 
-            if ($bubbles)
+            if ($bubbles) {
                 $this->fmt->bubbles($bubbles);
+            }
 
-            if ($item->isInterface() && $single === '')
+            if ($item->isInterface() && $single === '') {
                 $name .= sprintf(' (%d)', count($item->getMethods()));
+            }
 
             $this->fmt->text('name', $name, $meta, $this->linkify($item));
         }
 
         $this->fmt->cacheLock($hash);
     }
-
-
 
     /**
      * Generates an URL that points to the documentation page relevant for the requested context
@@ -1084,7 +1081,6 @@ class VarDumper
 
     protected function hasInstanceTimedOut()
     {
-
         if (static::$timeout > 0) {
             return true;
         }
@@ -1108,7 +1104,6 @@ class VarDumper
     protected function evaluate(&$subject, $specialStr = false)
     {
         switch ($type = gettype($subject)) {
-
                 // https://github.com/digitalnature/php-ref/issues/13
             case 'unknown type':
                 return $this->fmt->text('unknown');
@@ -1146,9 +1141,9 @@ class VarDumper
                 // first recursion level detection;
                 // this is optional (used to print consistent recursion info)
                 foreach ($subject as $key => &$value) {
-
-                    if (!is_array($value))
+                    if (!is_array($value)) {
                         continue;
+                    }
 
                     // save current value in a temporary variable
                     $buffer = $value;
@@ -1170,20 +1165,23 @@ class VarDumper
 
                 $this->fmt->text('array');
                 $count = count($subject);
-                if (!$this->fmt->startGroup($count))
+
+                if (!$this->fmt->startGroup($count)) {
                     return;
+                }
 
                 $max = max(array_map('static::strLen', array_keys($subject)));
                 $subject[static::MARKER_KEY] = true;
 
                 foreach ($subject as $key => &$value) {
-
                     // ignore our temporary marker
-                    if ($key === static::MARKER_KEY)
+                    if ($key === static::MARKER_KEY) {
                         continue;
+                    }
 
-                    if ($this->hasInstanceTimedOut())
+                    if ($this->hasInstanceTimedOut()) {
                         break;
+                    }
 
                     $keyInfo = gettype($key);
 
@@ -1218,13 +1216,13 @@ class VarDumper
 
                 $this->fmt->text('resource', strval($subject));
 
-                if (!static::$config['showResourceInfo'])
+                if (!static::$config['showResourceInfo']) {
                     return $this->fmt->emptyGroup($resType);
+                }
 
                 // @see: http://php.net/manual/en/resource.php
                 // need to add more...
                 switch ($resType) {
-
                         // curl extension resource
                     case 'curl':
                         $meta = curl_getinfo($subject);
@@ -1497,8 +1495,6 @@ class VarDumper
                             try {
                                 $components = $this->splitRegex($subject);
                                 if ($components) {
-                                    $regex = '';
-
                                     $this->fmt->startContain('regex', true);
                                     foreach ($components as $component)
                                         $this->fmt->text('regex-' . key($component), reset($component));
@@ -1544,11 +1540,11 @@ class VarDumper
         $this->fmt->endContain();
 
         // already been here?
-        if ($recursion)
+        if ($recursion) {
             return $this->fmt->emptyGroup('recursion');
+        }
 
         $hashes[$hash] = 1;
-
         $flags = \ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED;
 
         if (static::$config['showPrivateMembers']) {
@@ -1592,8 +1588,9 @@ class VarDumper
             return $this->fmt->emptyGroup();
         }
 
-        if (!$this->fmt->startGroup())
+        if (!$this->fmt->startGroup()) {
             return;
+        }
 
         // show contents for iterators
         if (static::$config['showIteratorContents'] && $reflector->isIterateable()) {
@@ -1622,7 +1619,6 @@ class VarDumper
 
         // display the interfaces this objects' class implements
         if ($interfaces) {
-            $items = array();
             $this->fmt->sectionTitle('Implements');
             $this->fmt->startRow();
             $this->fmt->startContain('interfaces');
@@ -1700,14 +1696,17 @@ class VarDumper
             $this->fmt->sectionTitle('Properties');
 
             $max = 0;
-            foreach ($props as $idx => $prop)
-                if (($propNameLen = static::strLen($prop->name)) > $max)
+            foreach ($props as $idx => $prop) {
+                if (($propNameLen = static::strLen($prop->name)) > $max) {
                     $max = $propNameLen;
+                }
+            }
 
             foreach ($props as $idx => $prop) {
 
-                if ($this->hasInstanceTimedOut())
+                if ($this->hasInstanceTimedOut()) {
                     break;
+                }
 
                 $bubbles     = array();
                 $sourceClass = $prop->getDeclaringClass();
@@ -1715,17 +1714,20 @@ class VarDumper
                 $meta        = $sourceClass->isInternal() ? null : static::parseComment($prop->getDocComment());
 
                 if ($meta) {
-                    if ($inherited)
+                    if ($inherited) {
                         $meta['sub'] = array(array('Declared in', $sourceClass->getShortName()));
+                    }
 
-                    if (isset($meta['tags']['var'][0]))
+                    if (isset($meta['tags']['var'][0])) {
                         $meta['left'] = $meta['tags']['var'][0][0];
+                    }
 
                     unset($meta['tags']);
                 }
 
-                if ($prop->isProtected() || $prop->isPrivate())
+                if ($prop->isProtected() || $prop->isPrivate()) {
                     $prop->setAccessible(true);
+                }
 
                 $value = $prop->getValue($subject);
 
@@ -1734,21 +1736,25 @@ class VarDumper
                 $this->fmt->colDiv();
 
                 $bubbles  = array();
-                if ($prop->isProtected())
+                if ($prop->isProtected()) {
                     $bubbles[] = array('P', 'Protected');
+                }
 
-                if ($prop->isPrivate())
+                if ($prop->isPrivate()) {
                     $bubbles[] = array('!', 'Private');
+                }
 
                 $this->fmt->bubbles($bubbles);
 
                 $type = array('prop');
 
-                if ($inherited)
+                if ($inherited) {
                     $type[] = 'inherited';
+                }
 
-                if ($prop->isPrivate())
+                if ($prop->isPrivate()) {
                     $type[] = 'private';
+                }
 
                 $this->fmt->colDiv(2 - count($bubbles));
                 $this->fmt->startContain($type);
@@ -1767,14 +1773,17 @@ class VarDumper
             $this->fmt->sectionTitle('Properties (magic)');
 
             $max = 0;
-            foreach ($magicProps as $name => $value)
-                if (($propNameLen = static::strLen($name)) > $max)
-                    $max = $propNameLen;
 
             foreach ($magicProps as $name => $value) {
+                if (($propNameLen = static::strLen($name)) > $max) {
+                    $max = $propNameLen;
+                }
+            }
 
-                if ($this->hasInstanceTimedOut())
+            foreach ($magicProps as $name => $value) {
+                if ($this->hasInstanceTimedOut()) {
                     break;
+                }
 
                 // attempt to pull out doc comment from the "regular" property definition
                 try {
@@ -1803,10 +1812,9 @@ class VarDumper
 
         // class methods
         if ($methods && !$this->hasInstanceTimedOut()) {
-
             $this->fmt->sectionTitle('Methods');
-            foreach ($methods as $idx => $method) {
 
+            foreach ($methods as $idx => $method) {
                 $this->fmt->startRow();
                 $this->fmt->sep($method->isStatic() ? '::' : '->');
                 $this->fmt->colDiv();
@@ -1900,8 +1908,14 @@ class VarDumper
                         break;
                     }
 
+                    $rfType = $parameter->getType();
+
                     try {
-                        $paramClass = $parameter->getClass();
+                        $paramClass = null;
+
+                        if ($rfType && method_exists($rfType, 'isBuiltin') && !$rfType->isBuiltin() && method_exists($rfType, 'getName')) {
+                            $paramClass = new \ReflectionClass($rfType->getName());
+                        }
                     } catch (\Exception $e) {
                         // @see https://bugs.php.net/bug.php?id=32177&edit=1
                     }
@@ -1911,14 +1925,14 @@ class VarDumper
                         $this->fromReflector($paramClass, $paramClass->name);
                         $this->fmt->endContain();
                         $this->fmt->sep(' ');
-                    } elseif ($parameter->isArray()) {
+                    } elseif ($rfType && method_exists($rfType, 'getName') && $rfType->getName() === 'array') {
                         $this->fmt->text('hint', 'array');
                         $this->fmt->sep(' ');
                     } else {
                         $hasType = static::$env['is7'] && $parameter->hasType();
                         if ($hasType) {
                             $type = $parameter->getType();
-                            $this->fmt->text('hint', (string)$type);
+                            $this->fmt->text('hint', (string) $type);
                             $this->fmt->sep(' ');
                         }
                     }
@@ -1970,8 +1984,6 @@ class VarDumper
         $this->fmt->cacheLock($hash);
     }
 
-
-
     /**
      * Scans for known classes and functions inside the provided expression,
      * and linkifies them when possible
@@ -1981,7 +1993,6 @@ class VarDumper
      */
     protected function evaluateExp($expression = null)
     {
-
         if ($expression === null) {
             return;
         }
@@ -2072,8 +2083,6 @@ class VarDumper
         }
     }
 
-
-
     /**
      * Calculates real string length
      *
@@ -2085,8 +2094,6 @@ class VarDumper
         $encoding = function_exists('mb_detect_encoding') ? mb_detect_encoding($string) : false;
         return $encoding ? mb_strlen($string, $encoding) : strlen($string);
     }
-
-
 
     /**
      * Safe str_pad alternative

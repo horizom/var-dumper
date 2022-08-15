@@ -1,8 +1,8 @@
 <?php
 
-namespace Horizom\VarDumper;
+namespace Horizom\VarDumper\Formatter;
 
-abstract class RFormatter
+abstract class Formatter
 {
     /**
      * Flush output and send contents to the output device

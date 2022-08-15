@@ -27,7 +27,7 @@
       "Horizom\\VarDumper\\": "src/"
     },
     "files": [
-      "src/helpers.php.php"
+      "src/helpers.php"
     ]
   },
   "config": {

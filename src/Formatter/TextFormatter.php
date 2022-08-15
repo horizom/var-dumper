@@ -1,8 +1,10 @@
 <?php
 
-namespace Horizom\VarDumper;
+namespace Horizom\VarDumper\Formatter;
 
-class RTextFormatter extends RFormatter
+use Horizom\VarDumper\VarDumper;
+
+class TextFormatter extends Formatter
 {
     /**
      * Actual output

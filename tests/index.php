@@ -59,7 +59,7 @@ if (isset($_GET['mode'])) {
         dump(array(), $array, serialize(array('A', 'serialized', 'string')));
         dump(fopen('php://stdin', 'r'), function ($x, $d) {
         });
-        r(new \DateTimeZone('Pacific/Honolulu'));
+        dump(new \DateTimeZone('Pacific/Honolulu'));
         dump($obj, new VarDumper());
     } else {
 
