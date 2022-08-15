@@ -3,14 +3,13 @@
 use Horizom\VarDumper\VarDumper;
 
 /**
- * Shortcut to ref, HTML mode
+ * Shortcut to VarDumper, HTML mode
  *
  * @param   mixed $args
  * @return  void|string
  */
 function dump()
 {
-
     // arguments passed to this function
     $args = func_get_args();
 
@@ -33,7 +32,7 @@ function dump()
 
     // IE goes funky if there's no doctype
     if (!$capture && ($format === 'html') && !headers_sent() && (!ob_get_level() || ini_get('output_buffering'))) {
-        print '<!DOCTYPE HTML><html><head><title>REF</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body>';
+        print '<!DOCTYPE HTML><html><head><title>Horizom VarDumper</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body>';
     }
 
     $ref = new VarDumper($format);
@@ -59,7 +58,7 @@ function dump()
 }
 
 /**
- * Shortcut to ref, plain text mode
+ * Shortcut to VarDumper, plain text mode
  *
  * @param   mixed $args
  * @return  void|string

@@ -59,7 +59,7 @@ if (isset($_GET['mode'])) {
         dump(array(), $array, serialize(array('A', 'serialized', 'string')));
         dump(fopen('php://stdin', 'r'), function ($x, $d) {
         });
-        dump(new \DateTimeZone('Pacific/Honolulu'));
+        dump(new \DateTimeZone('Africa/Abidjan'));
         dump($obj, new VarDumper());
     } else {
 
@@ -67,7 +67,7 @@ if (isset($_GET['mode'])) {
         dump_text(array(), $array, serialize(array('A', 'serialized', 'string')));
         dump_text(fopen('php://stdin', 'r'), function ($x, $d) {
         });
-        dump_text(new \DateTimeZone('Pacific/Honolulu'));
+        dump_text(new \DateTimeZone('Africa/Abidjan'));
         dump_text($obj, new VarDumper());
     }
 
@@ -109,9 +109,10 @@ if (isset($_GET['mode'])) {
 </head>
 
 <body>
-    <h1><a href="https://github.com/digitalnature/php-ref">REF</a></h1>
+    <h1><a href="https://github.com/horizom/var-dumper">Horizom VarDumper</a></h1>
     <h2><a href="index.php?mode=html">HTML output</a> ~ <a href="index.php?mode=text">TEXT output</a></h2>
-    <h3> created by <a href="http://digitalnature.eu/">digitalnature</digitalnature>
+    <h3>
+        created by <a href="https://github.com/horizom/var-dumper">Docs</digitalnature>
     </h3>
 </body>
 
