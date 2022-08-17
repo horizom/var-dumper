@@ -30,6 +30,9 @@
       "src/helpers.php"
     ]
   },
+  "conflict": {
+    "symfony/var-dumper": "*"
+  },
   "config": {
     "sort-packages": true
   },

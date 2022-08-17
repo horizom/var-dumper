@@ -4,7 +4,9 @@
 <a href="https://packagist.org/packages/horizom/var-dumper"><img src="https://poser.pugx.org/horizom/var-dumper/license.svg" alt="License"></a>
 </p>
 
-VarDumper, or `dump()` is a nicer alternative to PHP's [`print_r`](http://php.net/manual/en/function.print-r.php) / [`var_dump`](http://php.net/manual/en/function.var-dump.php) functions.
+VarDumper, or `dump()` is a nicer alternative to PHP's [`print_r`](http://php.net/manual/en/function.print-r.php) / [`var_dump`](http://php.net/manual/en/function.var-dump.php) functions. 
+
+This project is a fork of the original project by [digitalnature](https://github.com/digitalnature/php-ref). A big thank you to him for the work he has done on his project.
 
 ## DEMO
 
@@ -112,3 +114,11 @@ Currently available options and their default values:
 - Refactor "bubbles" (for text-mode)
 - Correctly indent multi-line strings (text-mode)
 - Move separator tokens to ::before and ::after pseudo-elements (html-mode)
+
+## Changelog
+
+All notable changes to this project will be documented in the file [CHANGELOG](CHANGELOG.md).
+
+## License
+
+The Horizom framework is open-sourced software licensed under the [MIT license](LICENSE.md).
