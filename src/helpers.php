@@ -3,6 +3,32 @@
 use Horizom\VarDumper\VarDumper;
 
 /**
+ * Shortcut to VarDumper, HTML mode & die
+ *
+ * @param   mixed $args
+ * @return  void|string
+ */
+function ddump()
+{
+    $args = func_get_args();
+    dump($args);
+    die;
+}
+
+/**
+ * Shortcut to VarDumper, plain text mode & die
+ *
+ * @param   mixed $args
+ * @return  void|string
+ */
+function ddump_text()
+{
+    $args = func_get_args();
+    dump_text($args);
+    die;
+}
+
+/**
  * Shortcut to VarDumper, HTML mode
  *
  * @param   mixed $args

@@ -422,6 +422,6 @@ class HtmlFormatter extends Formatter
      */
     protected static function escape($var)
     {
-        return is_array($var) ? array_map('static::escape', $var) : htmlspecialchars($var ?? '', ENT_QUOTES);
+        return is_array($var) ? array_map(self::class . '::escape', $var) : htmlspecialchars($var ?? '', ENT_QUOTES);
     }
 }

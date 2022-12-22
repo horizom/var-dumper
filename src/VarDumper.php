@@ -1170,7 +1170,7 @@ class VarDumper
                     return;
                 }
 
-                $max = max(array_map('static::strLen', array_keys($subject)));
+                $max = max(array_map(self::class . '::strLen', array_keys($subject)));
                 $subject[static::MARKER_KEY] = true;
 
                 foreach ($subject as $key => &$value) {
@@ -1278,7 +1278,7 @@ class VarDumper
                     return;
                 }
 
-                $max = max(array_map('static::strLen', array_keys($meta)));
+                $max = max(array_map(self::class . '::strLen', array_keys($meta)));
                 foreach ($meta as $key => $value) {
                     $this->fmt->startRow();
                     $this->fmt->text('resourceProp', ucwords(str_replace('_', ' ', $key)));
@@ -1663,7 +1663,7 @@ class VarDumper
         // class constants
         if ($constants) {
             $this->fmt->sectionTitle('Constants');
-            $max = max(array_map('static::strLen', array_keys($constants)));
+            $max = max(array_map(self::class . '::strLen', array_keys($constants)));
             foreach ($constants as $name => $value) {
                 $meta = null;
                 $type = array('const');
