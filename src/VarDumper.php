@@ -1414,7 +1414,7 @@ class VarDumper
                                 $date   = new \DateTime($subject);
                                 $errors = \DateTime::getLastErrors();
 
-                                if (($errors['warning_count'] < 1) && ($errors['error_count'] < 1)) {
+                                if (is_array($errors) && ($errors['warning_count'] < 1) && ($errors['error_count'] < 1)) {
                                     $now    = new \Datetime('now');
                                     $nowUtc = new \Datetime('now', new \DateTimeZone('UTC'));
                                     $diff   = $now->diff($date);
